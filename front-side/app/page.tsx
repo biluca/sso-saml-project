@@ -7,13 +7,17 @@ export interface IApplicationProps { }
 
 const Application: React.FunctionComponent<IApplicationProps> = props => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [logged, setLogged] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [token, setToken] = useState<string>('');
 
   useEffect(() => {
-    console.log('Initiating SAML check.', 'START SAML');
 
+
+    //VALIDA SE O EXISTE UM USUÁRIO LOGADO!
+    //NÃO NECESSARIAMENTE PRECISA CHAMAR O BACK-END (TOKENS)
+    console.log('VALIDANDO USUÁRIO LOGADO');
     const res = axios({
       method: 'GET',
       url: 'http://localhost:5000/whostalking/',
@@ -22,20 +26,24 @@ const Application: React.FunctionComponent<IApplicationProps> = props => {
 
     res.then(response => {
       const data = response.data
-      console.log(data, 'SUCCESS SAML');
+      console.log(data, 'USUÁRIO LOGADO!');
 
       setName(data.name)
       setEmail(data.email)
       setToken(data.token)
+      setLogged(data.logged)
       setLoading(false);
     })
       .catch(error => {
-        console.log(error, 'ERROR SAML');
+        console.log(error, 'USUÁRIO NÃO LOGADO!');
         RedirectToLogin();
       })
   }, []);
 
+
+  //INICIA O PROCESSO DE LOGIN VIA SSO!
   const RedirectToLogin = () => {
+    console.log('REDIRECIONOU PARA LOGIN SSO!');
     window.location.replace('http://localhost:5000/login');
   }
 
